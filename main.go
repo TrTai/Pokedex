@@ -12,8 +12,16 @@ func main() {
 	for {
 		fmt.Print("Pokedex > ")
 		if scan.Scan() {
-			val := cleanInput(scan.Text())
-			fmt.Println("Your command was:", val[0])
+			inp := cleanInput(scan.Text())
+			if cmd, ok := cmdMap[inp[0]]; ok {
+				err := cmd.callback()
+				if err != nil {
+					fmt.Println("Error executing command:", err)
+				}
+			} else {
+				fmt.Println("Unknown command:", inp[0])
+			}
+
 		}
 	}
 }
