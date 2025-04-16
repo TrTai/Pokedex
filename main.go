@@ -13,8 +13,11 @@ func main() {
 		fmt.Print("Pokedex > ")
 		if scan.Scan() {
 			inp := cleanInput(scan.Text())
+			if len(inp) == 0 {
+				continue
+			}
 			if cmd, ok := cmdMap[inp[0]]; ok {
-				err := cmd.callback()
+				err := cmd.callback(&conf)
 				if err != nil {
 					fmt.Println("Error executing command:", err)
 				}
