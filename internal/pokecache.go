@@ -14,7 +14,7 @@ func NewCache(d time.Time) *Cache {
 	newCache := Cache{
 		createdAt: time.Now(),
 	}
-	newCache.reapLoop(interval)
+	go newCache.reapLoop(interval)
 	return &newCache
 }
 
@@ -30,4 +30,15 @@ func (c *Cache) Get(k string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop(d time.Duration) {
+	ticker := time.NewTicker(d)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				if time.Since(c.createdAt) > time.Now-d {
+					c.val = nil
+				}
+			}
+		}
+	}()
 }

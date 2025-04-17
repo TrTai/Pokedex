@@ -64,7 +64,7 @@ func commandMap(c *config) error {
 	if c.nextURL == "" {
 		c.nextURL = "https://pokeapi.co/api/v2/location-area/"
 	}
-	err := pokeGetLocs(c)
+	err := pokeGetLocs(c, c.nextURL)
 	if err != nil {
 		return fmt.Errorf("failed to get locations: %w", err)
 	}
@@ -72,12 +72,11 @@ func commandMap(c *config) error {
 }
 
 func commandMapb(c *config) error {
-	if c.previousURL == "" {
+	if c.previousURL == "" || c.previousURL == "https://pokeapi.co/api/v2/location-area/" {
 		fmt.Println("This is the first page.")
 		c.previousURL = "https://pokeapi.co/api/v2/location-area/"
 	}
-	c.nextURL = c.previousURL
-	err := pokeGetLocs(c)
+	err := pokeGetLocs(c, c.previousURL)
 	if err != nil {
 		return fmt.Errorf("failed to get locations: %w", err)
 	}

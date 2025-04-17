@@ -18,8 +18,8 @@ type mapResults struct {
 	LocURL string `json:"url"`
 }
 
-func pokeGetLocs(c *config) error {
-	resp, err := http.Get(c.nextURL)
+func pokeGetLocs(c *config, url string) error {
+	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to fetch location data: %w", err)
 	}
