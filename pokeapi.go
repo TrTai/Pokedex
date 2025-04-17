@@ -19,9 +19,6 @@ type mapResults struct {
 }
 
 func pokeGetLocs(c *config) error {
-	if c.nextURL == "" {
-		c.nextURL = "https://pokeapi.co/api/v2/location-area/"
-	}
 	resp, err := http.Get(c.nextURL)
 	if err != nil {
 		return fmt.Errorf("failed to fetch location data: %w", err)

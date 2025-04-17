@@ -53,7 +53,7 @@ func commandExit(c *config) error {
 
 func commandHelp(c *config) error {
 	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
+	fmt.Println("Usage:")
 	for _, cmd := range cmdMap {
 		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
@@ -61,6 +61,9 @@ func commandHelp(c *config) error {
 }
 
 func commandMap(c *config) error {
+	if c.nextURL == "" {
+		c.nextURL = "https://pokeapi.co/api/v2/location-area/"
+	}
 	err := pokeGetLocs(c)
 	if err != nil {
 		return fmt.Errorf("failed to get locations: %w", err)
