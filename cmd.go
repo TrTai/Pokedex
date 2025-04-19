@@ -3,82 +3,85 @@ package main
 import (
 	"fmt"
 	//"net/http"
+	"github.com/TrTai/pokeapi"
+	"github.com/TrTai/pokecache"
 	"os"
+	"time"
 )
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*config) error
-}
-
-type config struct {
-	nextURL     string
-	previousURL string
-}
-
-var cmdMap map[string]cliCommand
-var conf config
+var cmdMap map[string]pokeapi.CliCommand
+var conf pokeapi.Config
+var pokeCache *pokecache.Cache
 
 func init() {
-	cmdMap = map[string]cliCommand{
+	cmdMap = map[string]pokeapi.CliCommand{
 		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
+			Name:        "exit",
+			Description: "Exit the Pokedex",
+			Callback:    commandExit,
 		},
 		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
+			Name:        "help",
+			Description: "Displays a help message",
+			Callback:    commandHelp,
 		},
 		"map": {
-			name:        "map",
-			description: "Displays location list",
-			callback:    commandMap,
+			Name:        "map",
+			Description: "Displays location list",
+			Callback:    commandMap,
 		},
 		"mapb": {
-			name:        "mapb",
-			description: "Displays last location list",
-			callback:    commandMapb,
+			Name:        "mapb",
+			Description: "Displays last location list",
+			Callback:    commandMapb,
+		},
+		"explore": {
+			Name:        "explore",
+			Description: "Displays Pokemon at location",
+			Callback:    commandMapb,
 		},
 	}
+	pokeCache = pokecache.NewCache(30 * time.Minute)
 }
 
-func commandExit(c *config) error {
+func commandExit(c *pokeapi.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *pokeapi.Config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	for _, cmd := range cmdMap {
-		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
+		fmt.Printf("%s: %s\n", cmd.Name, cmd.Description)
 	}
 	return nil
 }
 
-func commandMap(c *config) error {
-	if c.nextURL == "" {
-		c.nextURL = "https://pokeapi.co/api/v2/location-area/"
+func commandMap(c *pokeapi.Config) error {
+	if c.NextURL == "" {
+		c.NextURL = "https://pokeapi.co/api/v2/location-area/"
 	}
-	err := pokeGetLocs(c, c.nextURL)
+	err := pokeapi.PokeGetLocs(c, c.NextURL, pokeCache)
 	if err != nil {
 		return fmt.Errorf("failed to get locations: %w", err)
 	}
 	return nil
 }
 
-func commandMapb(c *config) error {
-	if c.previousURL == "" || c.previousURL == "https://pokeapi.co/api/v2/location-area/" {
+func commandMapb(c *pokeapi.Config) error {
+	if c.PreviousURL == "" || c.PreviousURL == "https://pokeapi.co/api/v2/location-area/" {
 		fmt.Println("This is the first page.")
-		c.previousURL = "https://pokeapi.co/api/v2/location-area/"
+		c.PreviousURL = "https://pokeapi.co/api/v2/location-area/"
 	}
-	err := pokeGetLocs(c, c.previousURL)
+	err := pokeapi.PokeGetLocs(c, c.PreviousURL, pokeCache)
 	if err != nil {
 		return fmt.Errorf("failed to get locations: %w", err)
 	}
+	return nil
+}
+
+func commandExplore() error {
 	return nil
 }

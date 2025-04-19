@@ -17,7 +17,7 @@ func main() {
 				continue
 			}
 			if cmd, ok := cmdMap[inp[0]]; ok {
-				err := cmd.callback(&conf)
+				err := cmd.Callback(&conf)
 				if err != nil {
 					fmt.Println("Error executing command:", err)
 				}
