@@ -12,10 +12,19 @@ type exploreResponse struct {
 }
 
 type pokemonencounter struct {
-	Pokemon pokemon `json:"pokemon"`
+	Pokemon         pokemon      `json:"pokemon"`
+	version_details []versionDet `json:"version_details"`
 }
 type pokemon struct {
 	Name string `json:"name"`
+	url  string `json:"url"`
+}
+type versionDet struct {
+	version version `json:"version"`
+}
+type version struct {
+	Name string `json:"name"`
+	url  string `json:"url"`
 }
 
 func PokeGetExplore(conf *Config, url string, pc *pokecache.Cache) error {
@@ -25,7 +34,9 @@ func PokeGetExplore(conf *Config, url string, pc *pokecache.Cache) error {
 	}
 	encounterList := exploreResponse.pokemon_encounters
 	fmt.Println("Pokemon Encounters:")
-	for _, encounter := range encounterList {
+	fmt.Println(encounterList)
+	for i, encounter := range encounterList {
+		fmt.Println(i)
 		fmt.Printf("Pokemon: %s\n", encounter.Pokemon.Name)
 	}
 	return nil
@@ -67,7 +78,7 @@ func pokeGetExploreHttp(conf *Config, url string, pc *pokecache.Cache) (exploreR
 	if dErr != nil {
 		return exploreResponse{}, fmt.Errorf("failed to decode explore data: %w", err)
 	}
-
+	fmt.Println("Fetched new data from API")
 	exploreBytes, err := json.Marshal(exploreData)
 	if err != nil {
 		return exploreResponse{}, fmt.Errorf("failed to marshal explore data: %w", err)
