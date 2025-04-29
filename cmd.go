@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	//"net/http"
-	"github.com/TrTai/pokeapi"
-	"github.com/TrTai/pokecache"
 	"os"
 	"time"
+
+	"github.com/TrTai/pokeapi"
+	"github.com/TrTai/pokecache"
 )
 
 var cmdMap map[string]pokeapi.CliCommand
@@ -38,19 +39,19 @@ func init() {
 		"explore": {
 			Name:        "explore",
 			Description: "Displays Pokemon at location",
-			Callback:    commandMapb,
+			Callback:    commandExplore,
 		},
 	}
 	pokeCache = pokecache.NewCache(30 * time.Minute)
 }
 
-func commandExit(c *pokeapi.Config) error {
+func commandExit(c *pokeapi.Config, txt []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *pokeapi.Config) error {
+func commandHelp(c *pokeapi.Config, txt []string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	for _, cmd := range cmdMap {
@@ -59,7 +60,7 @@ func commandHelp(c *pokeapi.Config) error {
 	return nil
 }
 
-func commandMap(c *pokeapi.Config) error {
+func commandMap(c *pokeapi.Config, txt []string) error {
 	if c.NextURL == "" {
 		c.NextURL = "https://pokeapi.co/api/v2/location-area/"
 	}
@@ -70,7 +71,7 @@ func commandMap(c *pokeapi.Config) error {
 	return nil
 }
 
-func commandMapb(c *pokeapi.Config) error {
+func commandMapb(c *pokeapi.Config, txt []string) error {
 	if c.PreviousURL == "" || c.PreviousURL == "https://pokeapi.co/api/v2/location-area/" {
 		fmt.Println("This is the first page.")
 		c.PreviousURL = "https://pokeapi.co/api/v2/location-area/"
@@ -82,6 +83,19 @@ func commandMapb(c *pokeapi.Config) error {
 	return nil
 }
 
-func commandExplore() error {
+func commandExplore(c *pokeapi.Config, txt []string) error {
+	if txt == nil {
+		fmt.Println("Please provide a location name.")
+		return nil
+	} else if len(txt) > 1 {
+		fmt.Println("Please provide one location area name.")
+		return nil
+	}
+	locName := txt[0]
+	locURL := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s/", locName)
+	err := pokeapi.PokeGetExplore(c, locURL, pokeCache)
+	if err != nil {
+		return fmt.Errorf("failed to get encounters: %w", err)
+	}
 	return nil
 }

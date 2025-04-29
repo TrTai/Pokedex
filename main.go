@@ -16,8 +16,12 @@ func main() {
 			if len(inp) == 0 {
 				continue
 			}
+			if inp[0] == "explore" && len(inp) < 2 {
+				fmt.Println("Please provide a region to explore.")
+				continue
+			}
 			if cmd, ok := cmdMap[inp[0]]; ok {
-				err := cmd.Callback(&conf)
+				err := cmd.Callback(&conf, inp[1:])
 				if err != nil {
 					fmt.Println("Error executing command:", err)
 				}
