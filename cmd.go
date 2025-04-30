@@ -84,11 +84,8 @@ func commandMapb(c *pokeapi.Config, txt []string) error {
 }
 
 func commandExplore(c *pokeapi.Config, txt []string) error {
-	if txt == nil {
-		fmt.Println("Please provide a location name.")
-		return nil
-	} else if len(txt) > 1 {
-		fmt.Println("Please provide one location area name.")
+	if len(txt) != 1 {
+		fmt.Println("Please provide a location name with no spaces.")
 		return nil
 	}
 	locName := txt[0]
